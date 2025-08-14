@@ -1,81 +1,60 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+} from '@nestjs/common';
+import * as productsService from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  private products: Product[] = []; 
+  constructor(private readonly productsService: productsService.ProductsService) {}
 
   @Get()
-  getAllProducts() {
-    return this.products;
+  getAllProducts(): productsService.Product[] {
+    return this.productsService.findAll();
   }
 
   @Get(':id')
-  getProductById(@Param('id') id: string) {
-    const product = this.products.find(p => p.id === +id);
-    return product || `No product found with ID: ${id}`;
+  getProductById(@Param('id') id: string): productsService.Product {
+    return this.productsService.findOne(+id);
   }
 
   @Post()
-  createProduct(@Body() productData: Omit<Product, 'id'>) {
-    const newProduct: Product = { id: this.products.length + 1, ...productData };
-    this.products.push(newProduct);
+  createProduct(@Body() createProductDto: CreateProductDto) {
+    // Let the service handle the ID
+    const createdProduct = this.productsService.create(createProductDto);
+
+    // Return custom message with product info
     return {
       message: 'Product created successfully',
-      data: newProduct
+      id: createdProduct.id,
+      name: createdProduct.name,
+      price: createdProduct.price,
     };
   }
 
   @Put(':id')
-updateProduct(
-  @Param('id') id: string,
-  @Body() productData: Omit<Product, 'id'>
-) {
-  const productId = Number(id);
-
-  if (isNaN(productId)) {
-    return { message: `Invalid product ID: ${id}` };
+  updateProduct(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): productsService.Product {
+    const existingProduct = this.productsService.findOne(+id);
+    const updatedProduct: Omit<productsService.Product, 'id'> = {
+      ...existingProduct,
+      ...updateProductDto,
+    };
+    return this.productsService.update(+id, updatedProduct);
   }
-
-  const index = this.products.findIndex(p => p.id === productId);
-
-  if (index === -1) {
-    return { message: `Product with ID ${id} not found` };
-  }
-
-  this.products[index] = { id: productId, ...productData };
-
-  return {
-    message: `Product with ID ${id} updated successfully`,
-    updatedData: this.products[index]
-  };
-}
-
 
   @Delete(':id')
-deleteProduct(@Param('id') id: string) {
-  const productId = Number(id);
-
-  if (isNaN(productId)) {
-    return { message: `Invalid product ID: ${id}` };
+  deleteProduct(@Param('id') id: string) {
+    this.productsService.remove(+id);
+    return { message: `Product ${id} deleted successfully` };
   }
-
-  const index = this.products.findIndex(p => p.id === productId);
-
-  if (index === -1) {
-    return { message: `Product with ID ${id} not found` };
-  }
-
-  const deletedProduct = this.products.splice(index, 1)[0]; // remove product
-
-  return {
-    message: `Product with ID ${id} deleted successfully`,
-    deletedData: deletedProduct
-  };
-}
 }

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
+import { FirewallGuard } from 'src/firewall/firewall.guard';
 
 @Controller('user')
 export class UserController {
@@ -20,7 +21,8 @@ export class UserController {
         return 
     }
     @Post()
-    addUser(@Body() user: UserDto) { 
+    @UseGuards(FirewallGuard)
+    addUser(@Body(new ValidationPipe ({transform: true})) user: UserDto) { 
         return this.userService.addUser(user);
 }
 }

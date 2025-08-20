@@ -3,34 +3,51 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-
-    private users = [
-        { id: 1,
-            name: "Shripad", 
-            type:  "Admin"
-        },
-        { id: 2,
-            name: "Rahul", 
-            type:  "User"
-        }
-    ];
-    getAllUsers() {
-        return this.users;
+  private users = [
+    { 
+      id: 1,
+      name: "Shripad", 
+      type: "Admin",
+      email: "shripad@gmail.com",
+      password: "123456",
+    },
+    { 
+      id: 2,
+      name: "Rahul", 
+      type: "User",
+      email: "rahul@gmail.com",
+      password: "123458",
     }
+  ];
 
-    getUser(id: number) {
-        const user= this.users.find(user => user.id === id);
-        if (!user) {
-            throw new Error("User not found..!!")
-        }
-        return user;
+  getAllUsers() {
+    return this.users;
+  }
+
+  getUser(id: number) {
+    const user = this.users.find(user => user.id === id);
+    if (!user) {
+      throw new Error("User not found..!!");
     }
-    addUser(user: UserDto) { 
-        const id = Date.now();
-        this.users.push({ 
-            id, 
-            ...user
-     })
-     return this.getUser(id); 
-}
+    return user;
+  }
+
+  addUser(user: UserDto) { 
+    const id = Date.now();
+    const newUser = { 
+      id, 
+      ...user,
+      
+      email: user.email || 'default@example.com', 
+      password: this.hashPassword(user.password)
+    };
+    
+    this.users.push(newUser);
+    return this.getUser(id); 
+  }
+
+  private hashPassword(password: string): string {
+    
+    return `hashed_${password}_${Date.now()}`;
+  }
 }

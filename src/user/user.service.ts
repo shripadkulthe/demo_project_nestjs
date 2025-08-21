@@ -20,11 +20,16 @@ export class UserService {
     }
   ];
 
-  getAllUsers() {
+  async getAllUsers() {
+    
+    await new Promise(resolve => setTimeout(resolve, 200));
     return this.users;
   }
 
-  getUser(id: number) {
+  async getUser(id: number) {
+    
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
     const user = this.users.find(user => user.id === id);
     if (!user) {
       throw new Error("User not found..!!");
@@ -32,12 +37,14 @@ export class UserService {
     return user;
   }
 
-  addUser(user: UserDto) { 
+  async addUser(user: UserDto) { 
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const id = Date.now();
     const newUser = { 
       id, 
       ...user,
-      
       email: user.email || 'default@example.com', 
       password: this.hashPassword(user.password)
     };
@@ -47,7 +54,6 @@ export class UserService {
   }
 
   private hashPassword(password: string): string {
-    
     return `hashed_${password}_${Date.now()}`;
   }
 }

@@ -6,11 +6,6 @@ import { ExcludeFieldsInterceptor } from 'src/interceptors/exclude-fields.interc
 @Module({
   controllers: [UserController],
   providers: [
-    UserService,
-    {
-      provide: 'APP_INTERCEPTOR', 
-      useClass: ExcludeFieldsInterceptor,
-    },
-  ],
+    UserService],
 })
 export class UserModule {}

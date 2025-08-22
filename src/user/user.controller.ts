@@ -1,14 +1,30 @@
-import {Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards, UseInterceptors, ValidationPipe 
+import { 
+  Body, 
+  Controller, 
+  Get, 
+  NotFoundException, 
+  Param, 
+  ParseIntPipe, 
+  Post, 
+  UseGuards, 
+  UseInterceptors, 
+  ValidationPipe 
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { FirewallGuard } from 'src/firewall/firewall.guard';
 import { ExcludeFieldsInterceptor } from 'src/interceptors/exclude-fields.interceptor';
 import { TimeoutInterceptor } from 'src/interceptors/timeout.interceptor';
-import { ResponseInterceptor } from 'src/interceptors/response.interceptor'; 
+import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 
 @Controller('user')
-@UseInterceptors(ExcludeFieldsInterceptor, ResponseInterceptor) 
+
+@UseInterceptors(
+  LoggingInterceptor,          
+  ExcludeFieldsInterceptor,    
+  ResponseInterceptor          
+)
 export class UserController {
 
     constructor(private readonly userService: UserService) {}

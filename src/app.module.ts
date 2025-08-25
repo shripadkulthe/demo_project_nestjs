@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ProductsController } from './products/products.controller';
 import { ProductsService } from './products/products.service';
 import { UserModule } from './user/user.module';
+import { UserMiddleware } from './common/middleware/user.middleware';
 import { ApiTokenCheckMiddleware } from './common/middleware/api-token-check.middleware';
 
 @Module({
@@ -13,7 +14,7 @@ import { ApiTokenCheckMiddleware } from './common/middleware/api-token-check.mid
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
-    
+    consumer.apply(UserMiddleware).forRoutes('*');
     consumer.apply(ApiTokenCheckMiddleware)
       .forRoutes({path: '*', method: RequestMethod.ALL});
   }

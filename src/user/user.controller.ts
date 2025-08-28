@@ -1,5 +1,5 @@
 import { 
-  Body, Controller, Get, NotFoundException, Param, ParseIntPipe, 
+  Body, Controller, Get, Inject,NotFoundException, Param, ParseIntPipe, 
   Post, UseGuards, UseInterceptors, ValidationPipe 
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -9,7 +9,6 @@ import { ExcludeFieldsInterceptor } from 'src/interceptors/exclude-fields.interc
 import { TimeoutInterceptor } from 'src/interceptors/timeout.interceptor';
 import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
-
 import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -22,8 +21,15 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 )
 @UseGuards(RolesGuard) 
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    @Inject('APP_CONFIG') private readonly config: any, 
+  ) {}
 
+  @Get('config')
+  getConfig() {
+    return this.config;
+  }
+  
   @Get()
   @Roles('Admin') 
   @UseInterceptors(new TimeoutInterceptor(5000)) 

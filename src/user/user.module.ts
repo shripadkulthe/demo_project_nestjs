@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { ExcludeFieldsInterceptor } from 'src/interceptors/exclude-fields.interceptor';
+import { APP_CONFIG } from 'src/config/app.config';
 
 @Module({
   controllers: [UserController],
   providers: [
-    UserService],
+    UserService,
+    {
+      provide: 'APP_CONFIG',
+      useValue: APP_CONFIG,
+    },
+  ],
+  exports: ['APP_CONFIG'], 
 })
 export class UserModule {}

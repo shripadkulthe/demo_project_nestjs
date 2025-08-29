@@ -9,8 +9,12 @@ import { APP_CONFIG } from 'src/config/app.config';
     UserService,
     {
       provide: 'APP_CONFIG',
-      useValue: APP_CONFIG,
+      useFactory: async () => {
+        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return APP_CONFIG;
     },
+  },
   ],
   exports: ['APP_CONFIG'], 
 })

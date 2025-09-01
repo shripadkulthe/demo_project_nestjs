@@ -6,9 +6,20 @@ import { ProductsService } from './products/products.service';
 import { UserModule } from './user/user.module';
 import { UserMiddleware } from './common/middleware/user.middleware';
 import { ApiTokenCheckMiddleware } from './common/middleware/api-token-check.middleware';
+import { ConfigModule } from './config/config.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, DatabaseModule.register({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'admin',
+      password: '12345',
+      database: 'testdb',
+    }), ConfigModule.forRoot({
+      folder: './configs',  
+    }),],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],
 })

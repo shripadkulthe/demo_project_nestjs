@@ -13,6 +13,8 @@ export const User = createParamDecorator(
       email: 'shripad@gmail.com',
     };
 
-    return user;
+    request.user = user;
+
+    return data ? user[data as keyof typeof user] : user;
   },
 );

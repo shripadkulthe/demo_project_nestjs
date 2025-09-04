@@ -6,7 +6,7 @@ export class SingletonService {
   private readonly id = randomUUID();
 
   constructor() {
-    console.log('✅ SingletonService created with id:', this.id);
+    console.log('SingletonService created with id:', this.id);
   }
 
   getId() {

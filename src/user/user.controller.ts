@@ -36,6 +36,15 @@ export class UserController {
   getAllUsers() {
     return this.userService.getAllUsers();
   }
+  
+@Get(':id/validate/:password')
+async validateUser(
+  @Param('id', ParseIntPipe) id: number,
+  @Param('password') password: string,
+) {
+  return this.userService['authService'].validateUser(id, password);
+}
+
 
   @Get(':id')
   @UseInterceptors(new TimeoutInterceptor(5000)) 

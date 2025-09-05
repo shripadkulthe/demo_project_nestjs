@@ -9,9 +9,12 @@ import { ApiTokenCheckMiddleware } from './common/middleware/api-token-check.mid
 import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { ScopesModule } from './common/scopes/scopes.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
-  imports: [UserModule, ScopesModule,DatabaseModule.register({
+  imports: [UserModule,
+  ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
+  ScopesModule,DatabaseModule.register({
       type: 'postgres',
       host: 'localhost',
       port: 5432,

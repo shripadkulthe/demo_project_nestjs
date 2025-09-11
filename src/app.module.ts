@@ -10,6 +10,8 @@ import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { ScopesModule } from './common/scopes/scopes.module';
 import { AdminModule } from './admin/admin.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User1Module } from './user1/user1.module';
 
 @Module({
   imports: [UserModule,
@@ -23,7 +25,10 @@ import { AdminModule } from './admin/admin.module';
       database: 'testdb',
     }), ConfigModule.forRoot({
       folder: './configs',  
-    }),],
+    }),
+  MongooseModule.forRoot('mongodb://localhost:27017/demoProjectNestjs'),
+User1Module,
+],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],
 })

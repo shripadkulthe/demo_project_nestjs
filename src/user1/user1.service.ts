@@ -1,0 +1,35 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User1, User1Document } from './schemas/user1.schema';
+
+@Injectable()
+export class User1Service {
+  constructor(@InjectModel(User1.name) private user1Model: Model<User1Document>) {}
+
+  async getAllUsers1(): Promise<User1[]> {
+    return this.user1Model.find().exec();
+  }
+
+  async getUser1(id: string): Promise<User1> {
+    const user = await this.user1Model.findById(id).exec();
+    if (!user) throw new NotFoundException('User1 not found');
+    return user;
+  }
+
+  async addUser1(user: Partial<User1>): Promise<User1> {
+    const newUser = new this.user1Model(user);
+    return newUser.save();
+  }
+  async updateUser1(id: string, user: Partial<User1>): Promise<User1> {
+    const updatedUser = await this.user1Model.findByIdAndUpdate(id, user, { new: true }).exec();
+    if (!updatedUser) throw new NotFoundException('User1 not found');
+    return updatedUser;
+  }
+
+  async removeUser1(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.user1Model.findByIdAndDelete(id).exec();
+    if (!result) throw new NotFoundException('User1 not found');
+    return { deleted: true };
+  }
+}

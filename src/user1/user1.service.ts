@@ -16,6 +16,9 @@ export class User1Service {
     if (!user) throw new NotFoundException('User1 not found');
     return user;
   }
+  async findByEmail(email: string) {
+  return this.user1Model.findOne({ email }).exec();
+}
 
   async addUser1(user: Partial<User1>): Promise<User1> {
     const newUser = new this.user1Model(user);

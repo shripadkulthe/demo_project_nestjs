@@ -1,12 +1,9 @@
 import { Injectable,Inject, forwardRef } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
-import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
   ) {}
   private users = [
     { 

@@ -17,14 +17,30 @@ export class AuthService {
     const isMatch = await bcrypt.compare(pass, user.password);
     if (!isMatch) throw new UnauthorizedException('Invalid email or password');
 
-    const { password, ...result } = user.toObject(); 
+    const { password, ...result } = user.toObject();
     return result;
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user._id, role: user.type };
+    const userId = user._id.toString(); 
+    const payload = { email: user.email, sub: userId, role: user.type };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: 'secretKey123',
+      expiresIn: '15m',
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: 'refreshSecret123',
+      expiresIn: '7d',
+    });
+
+    const hashedRefresh = await bcrypt.hash(refreshToken, 10);
+    await this.user1Service.updateUser1(userId, { refreshToken: hashedRefresh });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 
@@ -36,5 +52,39 @@ export class AuthService {
       ...userData,
       password: hashedPassword,
     });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.user1Service.getUser1(userId);
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException();
+    }
+
+    const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!isMatch) throw new UnauthorizedException();
+
+    const payload = { email: user.email, sub: user._id.toString(), role: user.type };
+
+    const newAccessToken = this.jwtService.sign(payload, {
+      secret: 'secretKey123',
+      expiresIn: '15m',
+    });
+
+    const newRefreshToken = this.jwtService.sign(payload, {
+      secret: 'refreshSecret123',
+      expiresIn: '7d',
+    });
+
+    const hashedRefresh = await bcrypt.hash(newRefreshToken, 10);
+    await this.user1Service.updateUser1(user._id.toString(), { refreshToken: hashedRefresh });
+
+    return {
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+    };
+  }
+
+  async logout(userId: string) {
+    await this.user1Service.updateUser1(userId, { refreshToken: null });
   }
 }

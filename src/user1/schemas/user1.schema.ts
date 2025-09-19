@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 export type User1Document = User1 & Document;
 
-@Schema()
+@Schema({timestamps: true})
 export class User1 {
    _id: Types.ObjectId;
    

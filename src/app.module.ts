@@ -13,7 +13,7 @@ import { AdminModule } from './admin/admin.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User1Module } from './user1/user1.module';
 import { AuthModule } from './user1/auth/auth.module'; 
-
+import { UploadModule } from 'src/user1/uploads/upload.module';
 
 @Module({
   imports: [UserModule,
@@ -29,7 +29,7 @@ import { AuthModule } from './user1/auth/auth.module';
       folder: './configs',  
     }),
   MongooseModule.forRoot('mongodb://localhost:27017/demoProjectNestjs'),
-User1Module,AuthModule,
+User1Module,AuthModule,UploadModule
 ],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],

@@ -18,6 +18,7 @@ export class User1Controller {
 
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Single user by ID' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   getOne(@Param('id', ParseMongoIdPipe) id: string) {
     return this.user1Service.getUser1(id);
   }

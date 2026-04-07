@@ -52,7 +52,7 @@ async validateUser(
     try {
       return this.userService.getUser(id);
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new NotFoundException('Something went wrong');
     }
   }
 

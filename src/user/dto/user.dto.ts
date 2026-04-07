@@ -8,15 +8,15 @@ export class UserDto {
   })
   @MinLength(3)
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  type: string;
+  type!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @MinLength(6)
   @IsString()
-  password: string; 
+  password!: string; 
 }

@@ -14,9 +14,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User1Module } from './user1/user1.module';
 import { AuthModule } from './user1/auth/auth.module'; 
 import { UploadModule } from 'src/user1/uploads/upload.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [UserModule,
+  imports: [UserModule, ChatModule,
   ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
   ScopesModule,DatabaseModule.register({
       type: 'postgres',

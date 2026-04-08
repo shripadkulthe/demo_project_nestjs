@@ -1,7 +1,11 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect,
+import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
 } from '@nestjs/websockets';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { WsExceptionFilter } from './filters/ws-exception.filter';
+import { ChatDto } from './dto/chat.dto';
 
+@UseFilters(new WsExceptionFilter())
 @WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect {
@@ -14,13 +18,38 @@ export class ChatGateway
     console.log('Client disconnected:', client.id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,              
+    forbidNonWhitelisted: true, 
+    exceptionFactory: (errors) => new WsException(errors),
+  }))
   @SubscribeMessage('message')
   handleMessage(
-    @MessageBody() data: string,
+    @MessageBody() data: ChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     console.log('Message received:', data);
 
-    client.emit('reply', `Server: ${data}`);
+     if (data.room === 'banned') {
+      throw new WsException('You are not allowed in this room.');
+    }
+
+    client.emit('reply', {
+      room: data.room,
+      text: `Server Echo: ${data.text}`,
+    });
+  }
+  @SubscribeMessage('join')
+  handleJoin(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!room || typeof room !== 'string') {
+      // Manually throw WsException — filter will catch and format it
+      throw new WsException('Room name must be a non-empty string.');
+    }
+
+    client.join(room);
+    client.emit('joined', { room, message: `You joined room: ${room}` });
   }
 }

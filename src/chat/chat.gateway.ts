@@ -1,9 +1,10 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
+import { WsAuthGuard } from './guards/ws-auth.guard';
 
 @UseFilters(new WsExceptionFilter())
 @WebSocketGateway({ cors: true })
@@ -18,6 +19,7 @@ export class ChatGateway
     console.log('Client disconnected:', client.id);
   }
 
+  @UseGuards(WsAuthGuard)
   @UsePipes(new ValidationPipe({
     whitelist: true,              
     forbidNonWhitelisted: true, 

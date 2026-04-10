@@ -1,12 +1,14 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
 import { WsAuthGuard } from './guards/ws-auth.guard';
+import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
 
 @UseFilters(new WsExceptionFilter())
+@UseInterceptors(WsLoggingInterceptor)
 @WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect {

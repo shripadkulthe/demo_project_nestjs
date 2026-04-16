@@ -1,6 +1,6 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
@@ -12,6 +12,10 @@ import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
 @WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect {
+
+    constructor(
+    @Inject('CHAT_CONFIG') private config: any,
+  ) {}
 
   handleConnection(client: Socket) {
     console.log('Client connected:', client.id);
@@ -34,7 +38,7 @@ export class ChatGateway
   ) {
     console.log('Message received:', data);
 
-     if (data.room === 'banned') {
+     if (this.config.bannedRooms.includes(data.room)) {
       throw new WsException('You are not allowed in this room.');
     }
 

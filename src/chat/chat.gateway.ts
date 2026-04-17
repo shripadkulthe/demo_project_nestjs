@@ -19,6 +19,7 @@ export class ChatGateway
 
   handleConnection(client: Socket) {
     console.log('Client connected:', client.id);
+    console.log('Config:', this.config);
   }
 
   handleDisconnect(client: Socket) {
@@ -52,11 +53,16 @@ export class ChatGateway
     @MessageBody() room: string,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log('Config in join:', this.config);
+
     if (!room || typeof room !== 'string') {
       // Manually throw WsException — filter will catch and format it
       throw new WsException('Room name must be a non-empty string.');
     }
 
+    if (this.config.bannedRooms.includes(room)) {
+    throw new WsException('You cannot join this room');
+  }
     client.join(room);
     client.emit('joined', { room, message: `You joined room: ${room}` });
   }

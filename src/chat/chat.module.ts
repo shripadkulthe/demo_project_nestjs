@@ -8,8 +8,12 @@ import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
   providers: [ChatGateway, WsAuthGuard, WsLoggingInterceptor,
     {
       provide: 'CHAT_CONFIG',
-      useValue: {
-        bannedRooms: ['banned'],
+      useFactory: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        return {
+          bannedRooms: ['banned', 'admin'],
+        };
       },
     },
   ],

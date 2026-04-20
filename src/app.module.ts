@@ -17,7 +17,15 @@ import { UploadModule } from 'src/user1/uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [UserModule, ChatModule,
+  imports: [
+    UserModule, 
+    ChatModule.forRootAsync({
+      useFactory: async () => {
+        return {
+        bannedRooms: ['banned', 'admin'],
+    };
+  },
+}),
   ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
   ScopesModule,DatabaseModule.register({
       type: 'postgres',

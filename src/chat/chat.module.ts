@@ -2,6 +2,7 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { ChatGateway } from './chat.gateway';
 import { WsAuthGuard } from './guards/ws-auth.guard';
 import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
+import { ChatContextService } from './chatContextService';
 
 @Module({})
 export class ChatModule {
@@ -32,6 +33,7 @@ export class ChatModule {
         ChatGateway,
         WsAuthGuard,
         WsLoggingInterceptor,
+        ChatContextService,
         {
           provide: 'CHAT_CONFIG',
           useFactory: options.useFactory,

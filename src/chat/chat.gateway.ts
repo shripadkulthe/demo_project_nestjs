@@ -6,6 +6,7 @@ import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
 import { WsAuthGuard } from './guards/ws-auth.guard';
 import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
+import { ChatContextService } from './chatContextService';
 
 @UseFilters(new WsExceptionFilter())
 @UseInterceptors(WsLoggingInterceptor)
@@ -15,6 +16,7 @@ export class ChatGateway
 
     constructor(
     @Inject('CHAT_CONFIG') private config: any,
+    private readonly context: ChatContextService,
   ) {}
 
   handleConnection(client: Socket) {
@@ -37,7 +39,9 @@ export class ChatGateway
     @MessageBody() data: ChatDto,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('Message received:', data);
+     this.context.setUser(client.data.user);
+    console.log('Request ID:', this.context.requestId);
+    console.log('User from context:', this.context.getUser());
 
      if (this.config.bannedRooms.includes(data.room)) {
       throw new WsException('You are not allowed in this room.');
@@ -50,20 +54,28 @@ export class ChatGateway
   }
   @SubscribeMessage('join')
   handleJoin(
-    @MessageBody() room: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    console.log('Config in join:', this.config);
+  @MessageBody() room: string,
+  @ConnectedSocket() client: Socket,
+) {
+  const user = client.data?.user;
 
-    if (!room || typeof room !== 'string') {
-      // Manually throw WsException — filter will catch and format it
-      throw new WsException('Room name must be a non-empty string.');
-    }
+  if (user) {
+    this.context.setUser(user);
+  }
 
-    if (this.config.bannedRooms.includes(room)) {
+  console.log('Request ID:', this.context.requestId);
+  console.log('User from context:', this.context.getUser());
+  console.log('Config in join:', this.config);
+
+  if (!room || typeof room !== 'string') {
+    throw new WsException('Room name must be a non-empty string.');
+  }
+
+  if (this.config.bannedRooms.includes(room)) {
     throw new WsException('You cannot join this room');
   }
-    client.join(room);
-    client.emit('joined', { room, message: `You joined room: ${room}` });
-  }
+
+  client.join(room);
+  client.emit('joined', { room, message: `You joined room: ${room}` });
+}
 }

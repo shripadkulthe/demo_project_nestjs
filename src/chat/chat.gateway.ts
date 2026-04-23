@@ -1,6 +1,6 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject, forwardRef } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
@@ -16,6 +16,7 @@ export class ChatGateway
 
     constructor(
     @Inject('CHAT_CONFIG') private config: any,
+    @Inject(forwardRef(() => ChatContextService))
     private readonly context: ChatContextService,
   ) {}
 
@@ -27,6 +28,11 @@ export class ChatGateway
   handleDisconnect(client: Socket) {
     console.log('Client disconnected:', client.id);
   }
+
+   notifyUserChange(user: any) {
+    console.log('[ChatGateway] notifyUserChange called for:', user?.name);
+  }
+
 
   @UseGuards(WsAuthGuard)
   @UsePipes(new ValidationPipe({

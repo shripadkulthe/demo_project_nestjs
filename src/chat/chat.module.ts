@@ -4,16 +4,21 @@ import { WsAuthGuard } from './guards/ws-auth.guard';
 import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
 import { ChatContextService } from './chatContextService';
 
+export interface ChatConfig {
+  bannedRooms: string[];
+}
+
 @Module({})
 export class ChatModule {
 
-  static forRoot(config: { bannedRooms: string[] }): DynamicModule {
+  static forRoot(config: ChatConfig): DynamicModule {
     return {
       module: ChatModule,
       providers: [
         ChatGateway,
         WsAuthGuard,
         WsLoggingInterceptor,
+        ChatContextService,
         {
           provide: 'CHAT_CONFIG',
           useValue: config,
@@ -24,7 +29,7 @@ export class ChatModule {
   }
 
   static forRootAsync(options: {
-    useFactory: (...args: any[]) => Promise<any> | any;
+    useFactory: (...args: any[]) => Promise<ChatConfig> | ChatConfig;
     inject?: any[];
   }): DynamicModule {
     return {

@@ -6,7 +6,6 @@ import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
 import { WsAuthGuard } from './guards/ws-auth.guard';
 import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
-import { ChatContextService } from './chatContextService';
 import type{ ChatConfig } from './chat.module';
 
 @UseFilters(new WsExceptionFilter())
@@ -17,7 +16,6 @@ export class ChatGateway
 
   constructor(
     @Inject('CHAT_CONFIG') private config: ChatConfig,
-    private readonly context: ChatContextService,
   ) {}
 
   handleConnection(client: Socket) {
@@ -44,12 +42,11 @@ export class ChatGateway
     @MessageBody() data: ChatDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const requestId = Math.random().toString(36).substring(7);
-
-    this.context.setUser(client.data.user);
+    const requestId = client.data.requestId;
+    const user = client.data.user;
 
     console.log('Request ID:', requestId);
-    console.log('User:', this.context.getUser());
+    console.log('User:', user);
 
     if (this.config?.bannedRooms?.includes(data.room)) {
       throw new WsException('You are not allowed in this room.');
@@ -66,15 +63,11 @@ export class ChatGateway
     @MessageBody() room: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const requestId = Math.random().toString(36).substring(7);
-    const user = client.data?.user;
-
-    if (user) {
-      this.context.setUser(user);
-    }
+    const requestId = client.data.requestId;
+    const user = client.data.user;
 
     console.log('Request ID:', requestId);
-    console.log('User:', this.context.getUser());
+    console.log('User:', user);
 
     if (!room || typeof room !== 'string') {
       throw new WsException('Room name must be a non-empty string.');

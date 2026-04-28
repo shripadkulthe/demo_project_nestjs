@@ -1,6 +1,6 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException,
+import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, OnGatewayInit 
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject,OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
@@ -12,19 +12,33 @@ import type{ ChatConfig } from './chat.module';
 @UseInterceptors(WsLoggingInterceptor)
 @WebSocketGateway({ cors: true })
 export class ChatGateway
-  implements OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject('CHAT_CONFIG') private config: ChatConfig,
   ) {}
 
+  afterInit(server: any) {
+    console.log('[ChatGateway] WebSocket server initialized');
+    console.log('[ChatGateway] Adapter:', server?.engine?.constructor?.name);
+  }
+
+  onModuleInit() {
+    console.log('[ChatGateway] Module initialized');
+    console.log('[ChatGateway] Loaded config:', this.config);
+  }
+
+  onModuleDestroy() {
+    console.log('[ChatGateway] Module destroyed');
+
+  }
+
   handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
-    console.log('Config:', this.config);
+    console.log(`[ChatGateway] Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
+    console.log(`[ChatGateway] Client disconnected: ${client.id}`);
   }
 
   notifyUserChange(user: any) {

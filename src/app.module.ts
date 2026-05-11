@@ -15,6 +15,7 @@ import { User1Module } from './user1/user1.module';
 import { AuthModule } from './user1/auth/auth.module'; 
 import { UploadModule } from 'src/user1/uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
+import { GatewayExplorerModule } from './chat/discovery/gateway-explorer.module';
 
 @Module({
   imports: [
@@ -26,6 +27,8 @@ import { ChatModule } from './chat/chat.module';
     };
   },
 }),
+
+GatewayExplorerModule,
   ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
   ScopesModule,DatabaseModule.register({
       type: 'postgres',

@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ConfigService } from './config/config.service';
+import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database/database.service';
 import { SingletonService } from './common/scopes/singleton.service';
 import { RequestService } from './common/scopes/request.service';
@@ -10,11 +10,11 @@ import { TransientService } from './common/scopes/transient.service';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly configService: ConfigService,
     private readonly databaseService: DatabaseService,
     private readonly singletonService: SingletonService,
     private readonly requestService: RequestService,
     private readonly transientService: TransientService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get()
@@ -27,11 +27,9 @@ export class AppController {
     return this.databaseService.getConnectionInfo();
   }
 
-  @Get('config-folder')
-  getConfigFolder() {
-    return {
-      folder: this.configService.getFolder(),
-    };
+  @Get('config')
+  getConfig() {
+    return this.configService.get('app');
   }
 
 

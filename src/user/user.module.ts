@@ -1,7 +1,7 @@
 import { Module,forwardRef } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { APP_CONFIG } from 'src/config/app.config';
+import appConfig from 'src/config/app.config';
 
 @Module({
   controllers: [UserController],
@@ -12,7 +12,7 @@ import { APP_CONFIG } from 'src/config/app.config';
       useFactory: async () => {
         
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        return APP_CONFIG;
+        return appConfig();
     },
   },
   ],

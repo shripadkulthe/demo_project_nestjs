@@ -17,6 +17,7 @@ import { AuthModule } from './user1/auth/auth.module';
 import { UploadModule } from 'src/user1/uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayExplorerModule } from './chat/discovery/gateway-explorer.module';
+import { JWTAuthModule } from './jwt-auth/jwt-auth.module';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ GatewayExplorerModule,
       database: 'testdb',
     }),
   MongooseModule.forRoot('mongodb://localhost:27017/demoProjectNestjs'),
-User1Module,AuthModule,UploadModule
+User1Module,AuthModule,UploadModule,JWTAuthModule
 ],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],

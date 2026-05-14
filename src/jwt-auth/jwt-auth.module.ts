@@ -6,6 +6,7 @@ import { type StringValue } from 'ms';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthController } from './auth.controller';
   providers: [
     AuthService,
     JwtStrategy,
+    RolesGuard,
   ],
 
   exports: [AuthService],

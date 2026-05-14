@@ -22,11 +22,13 @@ export class AuthService {
       const user = {
         id: 1,
         username: 'shripad',
+        role: 'admin',
       };
 
       const payload = {
         sub: user.id,
         username: user.username,
+        role: user.role,
       };
 
       console.log('PAYLOAD:', payload);

@@ -1,6 +1,9 @@
 import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
+import { Role } from './roles.enum';
 
 @Controller('jwt-auth')
 export class AuthController {
@@ -14,12 +17,15 @@ export class AuthController {
     return this.authService.login();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+
+  @Roles(Role.ADMIN)
+
   @Get('profile')
   getProfile(@Request() req: any) {
 
     return {
-      message: 'Protected route accessed',
+      message: 'Admin route accessed',
       user: req.user,
     };
   }

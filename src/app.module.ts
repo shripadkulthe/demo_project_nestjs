@@ -18,9 +18,18 @@ import { UploadModule } from 'src/user1/uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayExplorerModule } from './chat/discovery/gateway-explorer.module';
 import { JWTAuthModule } from './jwt-auth/jwt-auth.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
 
   ConfigModule.forRoot({
     isGlobal: true,
@@ -56,8 +65,13 @@ GatewayExplorerModule,
 User1Module,AuthModule,UploadModule,JWTAuthModule
 ],
   controllers: [AppController, ProductsController],
-  providers: [AppService, ProductsService],
-})
+  providers: [
+    {
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard,
+  },
+    AppService, ProductsService],
+  })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserMiddleware).forRoutes('*');

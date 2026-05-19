@@ -1,9 +1,15 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Scope, Inject } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+  Scope,
+  Inject,
+} from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
 
-@Injectable({ scope: Scope.TRANSIENT }) 
+@Injectable({ scope: Scope.TRANSIENT })
 export class WsLoggingInterceptor implements NestInterceptor {
-
   private readonly createdAt = Date.now();
 
   constructor() {}
@@ -31,13 +37,13 @@ export class WsLoggingInterceptor implements NestInterceptor {
     console.log(`[${className}] User:`, user);
     console.log(`[${className}] Client ${client.id} sent:`, data);
 
-  return next.handle().pipe(
-    tap((response) => {
-      console.log(`[${className}] Handler: ${handlerName}`);
-      console.log(`[${className}] Client ${client.id} received:`, response);
-      console.log(`[${className}] Execution time: ${Date.now() - now}ms`);
-      console.log(`[${className}] ---- END REQUEST ----\n`);
-    }),
+    return next.handle().pipe(
+      tap((response) => {
+        console.log(`[${className}] Handler: ${handlerName}`);
+        console.log(`[${className}] Client ${client.id} received:`, response);
+        console.log(`[${className}] Execution time: ${Date.now() - now}ms`);
+        console.log(`[${className}] ---- END REQUEST ----\n`);
+      }),
     );
   }
 }

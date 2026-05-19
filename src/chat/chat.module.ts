@@ -10,7 +10,6 @@ export interface ChatConfig {
 
 @Module({})
 export class ChatModule {
-
   static forRoot(config: ChatConfig): DynamicModule {
     return {
       module: ChatModule,

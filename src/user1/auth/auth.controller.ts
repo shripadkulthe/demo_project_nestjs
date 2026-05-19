@@ -24,10 +24,10 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
-    @UseGuards(AuthGuard('jwt-refresh'))
+  @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   async refresh(@Request() req) {
-    const user = req.user; 
+    const user = req.user;
     return this.authService.refreshTokens(user.sub, user.refreshToken);
   }
 
@@ -36,5 +36,4 @@ export class AuthController {
   async logout(@Request() req) {
     return this.authService.logout(req.user.userId);
   }
-
 }

@@ -14,7 +14,7 @@ export class RequestService {
     return {
       scope: 'Request',
       id: this.id,
-      url: (this.request as any).url, 
+      url: (this.request as any).url,
     };
   }
 }

@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 
 export class UserDto {
   @Transform(({ value }) => {
-    if (value === "Shripad") return "Kulthe";
+    if (value === 'Shripad') return 'Kulthe';
     return value;
   })
   @MinLength(3)
@@ -18,5 +18,5 @@ export class UserDto {
 
   @MinLength(6)
   @IsString()
-  password!: string; 
+  password!: string;
 }

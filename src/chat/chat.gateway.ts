@@ -1,22 +1,42 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, OnGatewayInit 
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  WsException,
+  OnGatewayInit,
 } from '@nestjs/websockets';
-import { UseFilters, UsePipes, ValidationPipe, UseGuards, UseInterceptors, Inject,OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  UseFilters,
+  UsePipes,
+  ValidationPipe,
+  UseGuards,
+  UseInterceptors,
+  Inject,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { ChatDto } from './dto/chat.dto';
 import { WsAuthGuard } from './guards/ws-auth.guard';
 import { WsLoggingInterceptor } from './interceptors/ws-logging.interceptor';
-import type{ ChatConfig } from './chat.module';
+import type { ChatConfig } from './chat.module';
 
 @UseFilters(new WsExceptionFilter())
 @UseInterceptors(WsLoggingInterceptor)
 @WebSocketGateway({ cors: true })
 export class ChatGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, OnModuleInit, OnModuleDestroy {
-
-  constructor(
-    @Inject('CHAT_CONFIG') private config: ChatConfig,
-  ) {}
+  implements
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnGatewayInit,
+    OnModuleInit,
+    OnModuleDestroy
+{
+  constructor(@Inject('CHAT_CONFIG') private config: ChatConfig) {}
 
   afterInit(server: any) {
     console.log('[ChatGateway] WebSocket server initialized');
@@ -30,7 +50,6 @@ export class ChatGateway
 
   onModuleDestroy() {
     console.log('[ChatGateway] Module destroyed');
-
   }
 
   handleConnection(client: Socket) {
@@ -46,11 +65,13 @@ export class ChatGateway
   }
 
   @UseGuards(WsAuthGuard)
-  @UsePipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    exceptionFactory: (errors) => new WsException(errors),
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => new WsException(errors),
+    }),
+  )
   @SubscribeMessage('message')
   handleMessage(
     @MessageBody() data: ChatDto,
@@ -73,10 +94,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage('join')
-  handleJoin(
-    @MessageBody() room: string,
-    @ConnectedSocket() client: Socket,
-  ) {
+  handleJoin(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
     const requestId = client.data.requestId;
     const user = client.data.user;
 

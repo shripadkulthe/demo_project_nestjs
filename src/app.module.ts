@@ -13,7 +13,7 @@ import { ScopesModule } from './common/scopes/scopes.module';
 import { AdminModule } from './admin/admin.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User1Module } from './user1/user1.module';
-import { AuthModule } from './user1/auth/auth.module'; 
+import { AuthModule } from './user1/auth/auth.module';
 import { UploadModule } from 'src/user1/uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
 import { GatewayExplorerModule } from './chat/discovery/gateway-explorer.module';
@@ -23,7 +23,6 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -31,29 +30,25 @@ import { APP_GUARD } from '@nestjs/core';
       },
     ]),
 
-  ConfigModule.forRoot({
-    isGlobal: true,
-    load: [appConfig],
-  }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [appConfig],
+    }),
 
-  UserModule,
+    UserModule,
 
-  ChatModule.forRootAsync({
-    inject: [ConfigService],
+    ChatModule.forRootAsync({
+      inject: [ConfigService],
 
-    useFactory: async (
-    configService: ConfigService,
-    ) => ({
-      bannedRooms:
-        configService.get<string[]>(
-          'chat.bannedRooms',
-        ) || [],
+      useFactory: async (configService: ConfigService) => ({
+        bannedRooms: configService.get<string[]>('chat.bannedRooms') || [],
       }),
     }),
 
-GatewayExplorerModule,
-  ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
-  ScopesModule,DatabaseModule.register({
+    GatewayExplorerModule,
+    ...(process.env.LOAD_ADMIN === 'true' ? [AdminModule.forRoot()] : []),
+    ScopesModule,
+    DatabaseModule.register({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
@@ -61,21 +56,26 @@ GatewayExplorerModule,
       password: '12345',
       database: 'testdb',
     }),
-  MongooseModule.forRoot('mongodb://localhost:27017/demoProjectNestjs'),
-User1Module,AuthModule,UploadModule,JWTAuthModule
-],
+    MongooseModule.forRoot('mongodb://localhost:27017/demoProjectNestjs'),
+    User1Module,
+    AuthModule,
+    UploadModule,
+    JWTAuthModule,
+  ],
   controllers: [AppController, ProductsController],
   providers: [
     {
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard,
-  },
-    AppService, ProductsService],
-  })
-export class AppModule implements NestModule{
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    AppService,
+    ProductsService,
+  ],
+})
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserMiddleware).forRoutes('*');
     //consumer.apply(ApiTokenCheckMiddleware)
-     // .forRoutes({path: '*', method: RequestMethod.ALL});
+    // .forRoutes({path: '*', method: RequestMethod.ALL});
   }
 }

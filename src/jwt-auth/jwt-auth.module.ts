@@ -10,39 +10,26 @@ import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
-
     PassportModule,
 
     JwtModule.registerAsync({
+      imports: [ConfigModule],
 
-  imports: [ConfigModule],
+      inject: [ConfigService],
 
-  inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: process.env.JWT_SECRET!,
 
-  useFactory: async (
-    configService: ConfigService,
-  ) => ({
-
-    secret:
-      process.env.JWT_SECRET!,
-
-    signOptions: {
-      expiresIn:
-        configService.get<StringValue>(
-          'jwt.expiresIn',
-        ) || '1d',
-      },
+        signOptions: {
+          expiresIn: configService.get<StringValue>('jwt.expiresIn') || '1d',
+        },
+      }),
     }),
-  }),
   ],
 
   controllers: [AuthController],
 
-  providers: [
-    AuthService,
-    JwtStrategy,
-    RolesGuard,
-  ],
+  providers: [AuthService, JwtStrategy, RolesGuard],
 
   exports: [AuthService],
 })

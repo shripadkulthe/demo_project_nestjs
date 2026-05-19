@@ -9,7 +9,7 @@ export const User = createParamDecorator(
     const user = {
       id: 1,
       name: 'Shripad',
-      type: role, 
+      type: role,
       email: 'shripad@gmail.com',
     };
 

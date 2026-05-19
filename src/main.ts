@@ -9,28 +9,30 @@ import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-    app.use(helmet());
-    app.useWebSocketAdapter(new WsAdapter(app));
+  app.use(helmet());
+  app.useWebSocketAdapter(new WsAdapter(app));
 
   const config = new DocumentBuilder()
     .setTitle('My API')
     .setDescription('API documentation for my Demo NestJS project')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-   app.useGlobalFilters(new AllExceptionsFilter());
-   
-  app.useGlobalPipes(new ValidationPipe({
-    //whitelist: true,       
-    
-    transform: true,       
- }));
+  app.useGlobalFilters(new AllExceptionsFilter());
 
- app.enableShutdownHooks();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      //whitelist: true,
+
+      transform: true,
+    }),
+  );
+
+  app.enableShutdownHooks();
 
   await app.listen(3000);
 }

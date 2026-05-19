@@ -1,23 +1,24 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner } from '@nestjs/core';
-import { MESSAGE_MAPPING_METADATA, MESSAGE_METADATA, GATEWAY_METADATA } from '@nestjs/websockets/constants';
-  
+import {
+  MESSAGE_MAPPING_METADATA,
+  MESSAGE_METADATA,
+  GATEWAY_METADATA,
+} from '@nestjs/websockets/constants';
+
 @Injectable()
 export class GatewayDiscoveryService implements OnModuleInit {
-
   constructor(
     private readonly discoveryService: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
   ) {}
 
   onModuleInit() {
-
     console.log('\n[DiscoveryService] Scanning gateways...\n');
 
     const providers = this.discoveryService.getProviders();
 
     providers.forEach((wrapper) => {
-
       const instance = wrapper.instance;
 
       if (!instance) return;
@@ -35,11 +36,9 @@ export class GatewayDiscoveryService implements OnModuleInit {
 
       const gatewayName = instance.constructor.name;
 
-      const methods =
-        this.metadataScanner.getAllMethodNames(prototype);
+      const methods = this.metadataScanner.getAllMethodNames(prototype);
 
       methods.forEach((methodName) => {
-
         const methodRef = prototype[methodName];
 
         const isMessageHandler = Reflect.getMetadata(
@@ -49,10 +48,7 @@ export class GatewayDiscoveryService implements OnModuleInit {
 
         if (!isMessageHandler) return;
 
-        const event = Reflect.getMetadata(
-          MESSAGE_METADATA,
-          methodRef,
-        );
+        const event = Reflect.getMetadata(MESSAGE_METADATA, methodRef);
 
         if (!event) return;
 

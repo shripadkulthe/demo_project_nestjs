@@ -1,6 +1,15 @@
-import { 
-  Body, Controller, Get, Inject,NotFoundException, Param, ParseIntPipe, 
-  Post, UseGuards, UseInterceptors, ValidationPipe 
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
@@ -15,39 +24,39 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('user')
 @UseInterceptors(
-  LoggingInterceptor,          
-  ExcludeFieldsInterceptor,    
-  ResponseInterceptor          
+  LoggingInterceptor,
+  ExcludeFieldsInterceptor,
+  ResponseInterceptor,
 )
-@UseGuards(RolesGuard) 
+@UseGuards(RolesGuard)
 export class UserController {
-  constructor(private readonly userService: UserService,
-    @Inject('APP_CONFIG') private readonly config: any, 
+  constructor(
+    private readonly userService: UserService,
+    @Inject('APP_CONFIG') private readonly config: any,
   ) {}
 
   @Get('config')
   getConfig() {
     return this.config;
   }
-  
+
   @Get()
-  @Roles('Admin') 
-  @UseInterceptors(new TimeoutInterceptor(5000)) 
+  @Roles('Admin')
+  @UseInterceptors(new TimeoutInterceptor(5000))
   getAllUsers() {
     return this.userService.getAllUsers();
   }
-  
-@Get(':id/validate/:password')
-async validateUser(
-  @Param('id', ParseIntPipe) id: number,
-  @Param('password') password: string,
-) {
-  return this.userService['authService'].validateUser(id, password);
-}
 
+  @Get(':id/validate/:password')
+  async validateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('password') password: string,
+  ) {
+    return this.userService['authService'].validateUser(id, password);
+  }
 
   @Get(':id')
-  @UseInterceptors(new TimeoutInterceptor(5000)) 
+  @UseInterceptors(new TimeoutInterceptor(5000))
   getUser(@Param('id', ParseIntPipe) id: number) {
     try {
       return this.userService.getUser(id);
@@ -57,10 +66,10 @@ async validateUser(
   }
 
   @Post()
-  @Roles('Admin') 
+  @Roles('Admin')
   @UseGuards(FirewallGuard)
-  @UseInterceptors(new TimeoutInterceptor(10000)) 
-  addUser(@Body(new ValidationPipe({ transform: true })) user: UserDto) { 
+  @UseInterceptors(new TimeoutInterceptor(10000))
+  addUser(@Body(new ValidationPipe({ transform: true })) user: UserDto) {
     return this.userService.addUser(user);
   }
 

@@ -18,18 +18,18 @@ export class WsAdapter extends IoAdapter {
     server.use((socket, next) => {
       const token = socket.handshake.auth?.token;
 
-      console.log("Adapter middleware token:", token);
+      console.log('Adapter middleware token:', token);
 
       if (!token) {
-        return next(new Error("No token provided"));
+        return next(new Error('No token provided'));
       }
 
-      if (token !== "valid-token") {
-        return next(new Error("Invalid token"));
+      if (token !== 'valid-token') {
+        return next(new Error('Invalid token'));
       }
 
       // Optional: attach user
-      socket.data.user = { id: 1, name: "Demo User" };
+      socket.data.user = { id: 1, name: 'Demo User' };
 
       next();
     });

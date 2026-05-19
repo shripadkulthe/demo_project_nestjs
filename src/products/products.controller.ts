@@ -13,7 +13,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: productsService.ProductsService) {}
+  constructor(
+    private readonly productsService: productsService.ProductsService,
+  ) {}
 
   @Get()
   getAllProducts(): productsService.Product[] {

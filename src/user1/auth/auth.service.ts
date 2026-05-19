@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const userId = user._id.toString(); 
+    const userId = user._id.toString();
     const payload = { email: user.email, sub: userId, role: user.type };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -36,7 +36,9 @@ export class AuthService {
     });
 
     const hashedRefresh = await bcrypt.hash(refreshToken, 10);
-    await this.user1Service.updateUser1(userId, { refreshToken: hashedRefresh });
+    await this.user1Service.updateUser1(userId, {
+      refreshToken: hashedRefresh,
+    });
 
     return {
       access_token: accessToken,
@@ -63,7 +65,11 @@ export class AuthService {
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!isMatch) throw new UnauthorizedException();
 
-    const payload = { email: user.email, sub: user._id.toString(), role: user.type };
+    const payload = {
+      email: user.email,
+      sub: user._id.toString(),
+      role: user.type,
+    };
 
     const newAccessToken = this.jwtService.sign(payload, {
       secret: 'secretKey123',
@@ -76,7 +82,9 @@ export class AuthService {
     });
 
     const hashedRefresh = await bcrypt.hash(newRefreshToken, 10);
-    await this.user1Service.updateUser1(user._id.toString(), { refreshToken: hashedRefresh });
+    await this.user1Service.updateUser1(user._id.toString(), {
+      refreshToken: hashedRefresh,
+    });
 
     return {
       access_token: newAccessToken,

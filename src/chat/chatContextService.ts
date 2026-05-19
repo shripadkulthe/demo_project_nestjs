@@ -9,9 +9,9 @@ export class ChatContextService implements OnModuleInit {
 
   private gateway!: ChatGateway;
 
- constructor(private readonly moduleRef: ModuleRef) {}
+  constructor(private readonly moduleRef: ModuleRef) {}
 
- onModuleInit() {
+  onModuleInit() {
     this.gateway = this.moduleRef.get(ChatGateway, { strict: false });
   }
 

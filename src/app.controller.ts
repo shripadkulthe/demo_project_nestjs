@@ -32,7 +32,6 @@ export class AppController {
     return this.configService.get('app');
   }
 
-
   @Get('singleton')
   getSingleton() {
     return this.singletonService.getId();
@@ -47,7 +46,7 @@ export class AppController {
   getTransient() {
     return {
       first: this.transientService.getId(),
-      second: new TransientService().getId(), 
+      second: new TransientService().getId(),
     };
   }
 }

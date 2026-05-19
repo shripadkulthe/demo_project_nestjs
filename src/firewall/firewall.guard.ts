@@ -7,6 +7,6 @@ export class FirewallGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest();
-    return req.body.name === 'Shripad' ;
+    return req.body.name === 'Shripad';
   }
 }

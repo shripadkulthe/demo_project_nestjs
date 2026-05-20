@@ -7,11 +7,21 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { RolesGuard } from './roles.guard';
+import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
   imports: [
     PassportModule,
 
+    DatabaseModule.register({
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'postgres',
+    password: 'admin',
+    database: 'nestjs_auth',
+  }),
+  
     JwtModule.registerAsync({
       imports: [ConfigModule],
 

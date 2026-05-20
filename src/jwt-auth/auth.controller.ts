@@ -12,6 +12,7 @@ import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
 import { Role } from './roles.enum';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { LogoutDto } from './dto/logout.dto';
 
 @Controller('jwt-auth')
 export class AuthController {
@@ -28,6 +29,11 @@ export class AuthController {
     body: RefreshTokenDto,
   ) {
     return this.authService.refreshToken(body.refresh_token);
+  }
+
+  @Post('logout')
+  logout(@Body() body: LogoutDto) {
+    return this.authService.logout(body.userId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { type StringValue } from 'ms';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly databaseService: DatabaseService,
+  ) {}
 
   async login() {
     try {
@@ -54,6 +58,12 @@ export class AuthService {
 
       console.log('REFRESH TOKEN:', refresh_token);
 
+      const hashedRefreshToken = await bcrypt.hash(refresh_token, 10);
+
+      this.databaseService.saveRefreshToken(user.id, hashedRefreshToken);
+
+      console.log('HASHED REFRESH TOKEN STORED:', hashedRefreshToken);
+
       return {
         access_token,
         refresh_token,
@@ -64,6 +74,7 @@ export class AuthService {
       throw error;
     }
   }
+
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
@@ -71,6 +82,23 @@ export class AuthService {
       });
 
       console.log('REFRESH PAYLOAD:', payload);
+
+      const storedToken = this.databaseService.getRefreshToken(payload.sub);
+
+      if (!storedToken) {
+        throw new UnauthorizedException('Refresh token not found');
+      }
+
+      const isRefreshTokenValid = await bcrypt.compare(
+        refreshToken,
+        storedToken,
+      );
+
+      if (!isRefreshTokenValid) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      console.log('REFRESH TOKEN VALID:', isRefreshTokenValid);
 
       const newPayload = {
         sub: payload.sub,
@@ -93,5 +121,21 @@ export class AuthService {
 
       throw error;
     }
+  }
+
+  logout(userId: number) {
+    const storedToken = this.databaseService.getRefreshToken(userId);
+
+    if (!storedToken) {
+      throw new UnauthorizedException('User already logged out');
+    }
+
+    this.databaseService.removeRefreshToken(userId);
+
+    console.log(`REFRESH TOKEN REMOVED FOR USER ${userId}`);
+
+    return {
+      message: 'Logout successful',
+    };
   }
 }

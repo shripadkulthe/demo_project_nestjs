@@ -12,6 +12,7 @@ export interface DatabaseOptions {
 @Injectable()
 export class DatabaseService {
   private options: DatabaseOptions;
+  private refreshTokens = new Map<number, string>();
 
   constructor(options: DatabaseOptions) {
     this.options = options;
@@ -25,5 +26,16 @@ export class DatabaseService {
       database: this.options.database,
       user: this.options.username,
     };
+  }
+  saveRefreshToken(userId: number, token: string) {
+    this.refreshTokens.set(userId, token);
+  }
+
+  getRefreshToken(userId: number) {
+    return this.refreshTokens.get(userId);
+  }
+
+  removeRefreshToken(userId: number) {
+    this.refreshTokens.delete(userId);
   }
 }

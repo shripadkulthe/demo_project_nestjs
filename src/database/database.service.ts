@@ -13,6 +13,13 @@ export interface DatabaseOptions {
 export class DatabaseService {
   private options: DatabaseOptions;
   private refreshTokens = new Map<number, string>();
+  private resetPasswordTokens = new Map<
+    string,
+    {
+      userId: number;
+      expires: Date;
+    }
+  >();
 
   constructor(options: DatabaseOptions) {
     this.options = options;
@@ -37,5 +44,23 @@ export class DatabaseService {
 
   removeRefreshToken(userId: number) {
     this.refreshTokens.delete(userId);
+  }
+  saveResetPasswordToken(
+    userId: number,
+    token: string,
+    expires: Date,
+  ) {
+    this.resetPasswordTokens.set(token, {
+      userId,
+      expires,
+    });
+  }
+
+  getResetPasswordToken(token: string) {
+    return this.resetPasswordTokens.get(token);
+  }
+
+  removeResetPasswordToken(token: string) {
+    this.resetPasswordTokens.delete(token);
   }
 }

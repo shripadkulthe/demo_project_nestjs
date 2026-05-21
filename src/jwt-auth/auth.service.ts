@@ -3,12 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { type StringValue } from 'ms';
 import { DatabaseService } from 'src/database/database.service';
+import { BadRequestException } from '@nestjs/common';
+import { randomBytes } from 'crypto';
+import { MailService } from './mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly databaseService: DatabaseService,
+    private readonly mailService: MailService,
   ) {}
 
   async login() {
@@ -138,4 +142,61 @@ export class AuthService {
       message: 'Logout successful',
     };
   }
+  async forgotPassword(email: string) {
+  const user = {
+    id: 1,
+    email: 'test@gmail.com',
+  };
+
+  if (user.email !== email) {
+    throw new BadRequestException('User not found');
+  }
+
+  const resetToken = randomBytes(32).toString('hex');
+
+  const expiry = new Date();
+
+  expiry.setHours(expiry.getHours() + 1);
+
+  this.databaseService.saveResetPasswordToken(
+    user.id,
+    resetToken,
+    expiry,
+  );
+
+  console.log('RESET TOKEN:', resetToken);
+
+  return {
+    message: 'Password reset email sent',
+  };
+}
+
+async resetPassword(
+  token: string,
+  newPassword: string,
+) {
+  const storedData =
+    this.databaseService.getResetPasswordToken(token);
+
+  if (!storedData) {
+    throw new BadRequestException('Invalid token');
+  }
+
+  if (storedData.expires < new Date()) {
+    throw new BadRequestException('Token expired');
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    newPassword,
+    10,
+  );
+
+  console.log('NEW HASHED PASSWORD:', hashedPassword);
+
+  this.databaseService.removeResetPasswordToken(token);
+
+  return {
+    message: 'Password reset successful',
+  };
+}
 }

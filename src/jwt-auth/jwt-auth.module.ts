@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { RolesGuard } from './roles.guard';
 import { DatabaseModule } from 'src/database/database.module';
+import { MailService } from './mail.service';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { DatabaseModule } from 'src/database/database.module';
 
   controllers: [AuthController],
 
-  providers: [AuthService, JwtStrategy, RolesGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, MailService],
 
   exports: [AuthService],
 })

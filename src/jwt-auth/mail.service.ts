@@ -11,12 +11,8 @@ export class MailService {
     },
   });
 
-  async sendResetPasswordEmail(
-    email: string,
-    token: string,
-  ) {
-    const resetLink =
-      `http://localhost:3000/jwt-auth/reset-password?token=${token}`;
+  async sendResetPasswordEmail(email: string, token: string) {
+    const resetLink = `http://localhost:3000/jwt-auth/reset-password?token=${token}`;
 
     await this.transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -31,5 +27,15 @@ export class MailService {
         </a>
       `,
     });
+  }
+
+  async sendVerificationEmail(email: string, token: string) {
+    const verifyLink = `http://localhost:3000/jwt-auth/verify-email?token=${token}`;
+
+    console.log('VERIFY EMAIL LINK:', verifyLink);
+
+    return {
+      message: 'Verification email simulated',
+    };
   }
 }

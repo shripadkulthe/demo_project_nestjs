@@ -8,6 +8,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Controller('jwt-auth')
 export class AuthController {
@@ -45,6 +46,20 @@ resetPassword(
   return this.authService.resetPassword(
     body.token,
     body.newPassword,
+  );
+}
+
+  @Post('register')
+register() {
+  return this.authService.register();
+}
+
+@Post('verify-email')
+verifyEmail(
+  @Body() body: VerifyEmailDto,
+) {
+  return this.authService.verifyEmail(
+    body.token,
   );
 }
 

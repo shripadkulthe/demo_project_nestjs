@@ -15,14 +15,14 @@ import { MailService } from './mail.service';
     PassportModule,
 
     DatabaseModule.register({
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'admin',
-    database: 'nestjs_auth',
-  }),
-  
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'admin',
+      database: 'nestjs_auth',
+    }),
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
 

@@ -21,6 +21,14 @@ export class DatabaseService {
     }
   >();
 
+  private emailVerificationTokens = new Map<
+    string,
+    {
+      userId: number;
+      expires: Date;
+    }
+  >();
+
   constructor(options: DatabaseOptions) {
     this.options = options;
   }
@@ -45,11 +53,7 @@ export class DatabaseService {
   removeRefreshToken(userId: number) {
     this.refreshTokens.delete(userId);
   }
-  saveResetPasswordToken(
-    userId: number,
-    token: string,
-    expires: Date,
-  ) {
+  saveResetPasswordToken(userId: number, token: string, expires: Date) {
     this.resetPasswordTokens.set(token, {
       userId,
       expires,
@@ -62,5 +66,20 @@ export class DatabaseService {
 
   removeResetPasswordToken(token: string) {
     this.resetPasswordTokens.delete(token);
+  }
+
+  saveEmailVerificationToken(userId: number, token: string, expires: Date) {
+    this.emailVerificationTokens.set(token, {
+      userId,
+      expires,
+    });
+  }
+
+  getEmailVerificationToken(token: string) {
+    return this.emailVerificationTokens.get(token);
+  }
+
+  removeEmailVerificationToken(token: string) {
+    this.emailVerificationTokens.delete(token);
   }
 }

@@ -143,60 +143,97 @@ export class AuthService {
     };
   }
   async forgotPassword(email: string) {
-  const user = {
-    id: 1,
-    email: 'test@gmail.com',
-  };
+    const user = {
+      id: 1,
+      email: 'test@gmail.com',
+    };
 
-  if (user.email !== email) {
-    throw new BadRequestException('User not found');
+    if (user.email !== email) {
+      throw new BadRequestException('User not found');
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+
+    const expiry = new Date();
+
+    expiry.setHours(expiry.getHours() + 1);
+
+    this.databaseService.saveResetPasswordToken(user.id, resetToken, expiry);
+
+    console.log('RESET TOKEN:', resetToken);
+
+    return {
+      message: 'Password reset email sent',
+    };
   }
 
-  const resetToken = randomBytes(32).toString('hex');
+  async resetPassword(token: string, newPassword: string) {
+    const storedData = this.databaseService.getResetPasswordToken(token);
 
-  const expiry = new Date();
+    if (!storedData) {
+      throw new BadRequestException('Invalid token');
+    }
 
-  expiry.setHours(expiry.getHours() + 1);
+    if (storedData.expires < new Date()) {
+      throw new BadRequestException('Token expired');
+    }
 
-  this.databaseService.saveResetPasswordToken(
-    user.id,
-    resetToken,
-    expiry,
-  );
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  console.log('RESET TOKEN:', resetToken);
+    console.log('NEW HASHED PASSWORD:', hashedPassword);
 
-  return {
-    message: 'Password reset email sent',
-  };
-}
+    this.databaseService.removeResetPasswordToken(token);
 
-async resetPassword(
-  token: string,
-  newPassword: string,
-) {
-  const storedData =
-    this.databaseService.getResetPasswordToken(token);
-
-  if (!storedData) {
-    throw new BadRequestException('Invalid token');
+    return {
+      message: 'Password reset successful',
+    };
   }
 
-  if (storedData.expires < new Date()) {
-    throw new BadRequestException('Token expired');
+  async register() {
+    const user = {
+      id: 1,
+      email: 'test@gmail.com',
+      isVerified: false,
+    };
+
+    const verificationToken = randomBytes(32).toString('hex');
+
+    const expiry = new Date();
+
+    expiry.setHours(expiry.getHours() + 1);
+
+    this.databaseService.saveEmailVerificationToken(
+      user.id,
+      verificationToken,
+      expiry,
+    );
+
+    console.log('EMAIL VERIFICATION TOKEN:', verificationToken);
+
+    await this.mailService.sendVerificationEmail(user.email, verificationToken);
+
+    return {
+      message: 'Registration successful. Verify your email.',
+    };
   }
 
-  const hashedPassword = await bcrypt.hash(
-    newPassword,
-    10,
-  );
+  async verifyEmail(token: string) {
+    const storedData = this.databaseService.getEmailVerificationToken(token);
 
-  console.log('NEW HASHED PASSWORD:', hashedPassword);
+    if (!storedData) {
+      throw new BadRequestException('Invalid verification token');
+    }
 
-  this.databaseService.removeResetPasswordToken(token);
+    if (storedData.expires < new Date()) {
+      throw new BadRequestException('Verification token expired');
+    }
 
-  return {
-    message: 'Password reset successful',
-  };
-}
+    this.databaseService.removeEmailVerificationToken(token);
+
+    console.log(`EMAIL VERIFIED FOR USER ${storedData.userId}`);
+
+    return {
+      message: 'Email verified successfully',
+    };
+  }
 }

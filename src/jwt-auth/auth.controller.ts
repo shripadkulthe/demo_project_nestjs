@@ -9,16 +9,27 @@ import { LogoutDto } from './dto/logout.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ApiTags, ApiOperation, ApiBody,ApiBearerAuth } from '@nestjs/swagger';
 
+
+@ApiTags('JWT Authentication')
 @Controller('jwt-auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+  summary: 'Generate access and refresh tokens',
+ })
   @Get('login')
   login() {
     return this.authService.login();
   }
 
+  @ApiOperation({
+  summary: 'Generate new access token using refresh token',
+})
+
+  @ApiBody({ type: RefreshTokenDto })
   @Post('refresh')
   refresh(
     @Body()
@@ -27,18 +38,31 @@ export class AuthController {
     return this.authService.refreshToken(body.refresh_token);
   }
 
+  @ApiOperation({
+  summary: 'Logout user and revoke refresh token',
+  })
+  @ApiBody({ type: LogoutDto })
   @Post('logout')
   logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.userId);
   }
 
-  @Post('forgot-password')
-forgotPassword(
-  @Body() body: ForgotPasswordDto,
-) {
-  return this.authService.forgotPassword(body.email);
-}
+  @ApiOperation({
+  summary: 'Send password reset token',
+})
 
+  @ApiBody({ type: ForgotPasswordDto })
+  @Post('forgot-password')
+  forgotPassword(
+  @Body() body: ForgotPasswordDto,
+  ) {
+  return this.authService.forgotPassword(body.email);
+  }
+
+  @ApiOperation({
+  summary: 'Reset user password using token',
+})
+@ApiBody({ type: ResetPasswordDto })
   @Post('reset-password')
 resetPassword(
   @Body() body: ResetPasswordDto,
@@ -49,11 +73,18 @@ resetPassword(
   );
 }
 
+  @ApiOperation({
+  summary: 'Register new user',
+})
   @Post('register')
 register() {
   return this.authService.register();
 }
 
+@ApiOperation({
+  summary: 'Verify user email using token',
+})
+@ApiBody({ type: VerifyEmailDto })
 @Post('verify-email')
 verifyEmail(
   @Body() body: VerifyEmailDto,
@@ -63,6 +94,10 @@ verifyEmail(
   );
 }
 
+  @ApiBearerAuth()
+@ApiOperation({
+  summary: 'Access protected admin profile route',
+})
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get('profile')

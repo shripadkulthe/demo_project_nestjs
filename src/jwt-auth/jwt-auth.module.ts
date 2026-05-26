@@ -3,7 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { type StringValue } from 'ms';
-import { AuthService } from './auth.service';
+import { JwtAuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { RolesGuard } from './roles.guard';
@@ -40,8 +40,8 @@ import { MailService } from './mail.service';
 
   controllers: [AuthController],
 
-  providers: [AuthService, JwtStrategy, RolesGuard, MailService],
+  providers: [JwtAuthService, JwtStrategy, RolesGuard, MailService],
 
-  exports: [AuthService],
+  exports: [JwtAuthService],
 })
 export class JWTAuthModule {}

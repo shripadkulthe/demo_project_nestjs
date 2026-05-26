@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Post,
-  UseGuards,
-  UseInterceptors,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Get, Inject, NotFoundException, Param, ParseIntPipe, Post, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { FirewallGuard } from 'src/firewall/firewall.guard';
@@ -28,7 +16,6 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
   ExcludeFieldsInterceptor,
   ResponseInterceptor,
 )
-@UseGuards(RolesGuard)
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -41,7 +28,6 @@ export class UserController {
   }
 
   @Get()
-  @Roles('Admin')
   @UseInterceptors(new TimeoutInterceptor(5000))
   getAllUsers() {
     return this.userService.getAllUsers();
@@ -57,7 +43,7 @@ export class UserController {
 
   @Get(':id')
   @UseInterceptors(new TimeoutInterceptor(5000))
-  getUser(@Param('id', ParseIntPipe) id: number) {
+  getUser(@Param('id') id: string) {
     try {
       return this.userService.getUser(id);
     } catch (error) {
@@ -66,8 +52,6 @@ export class UserController {
   }
 
   @Post()
-  @Roles('Admin')
-  @UseGuards(FirewallGuard)
   @UseInterceptors(new TimeoutInterceptor(10000))
   addUser(@Body(new ValidationPipe({ transform: true })) user: UserDto) {
     return this.userService.addUser(user);

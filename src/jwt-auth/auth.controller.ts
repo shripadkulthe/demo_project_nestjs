@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards, Request, Post, Body } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { JwtAuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
@@ -15,7 +15,7 @@ import { ApiTags, ApiOperation, ApiBody,ApiBearerAuth } from '@nestjs/swagger';
 @ApiTags('JWT Authentication')
 @Controller('jwt-auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: JwtAuthService) {}
 
   @ApiOperation({
   summary: 'Generate access and refresh tokens',

@@ -8,7 +8,7 @@ import { randomBytes } from 'crypto';
 import { MailService } from './mail.service';
 
 @Injectable()
-export class AuthService {
+export class JwtAuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly databaseService: DatabaseService,

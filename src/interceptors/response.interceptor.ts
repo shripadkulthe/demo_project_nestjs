@@ -29,7 +29,11 @@ export class ResponseInterceptor<T>
       map((data) => ({
         statusCode: response.statusCode,
         message: this.getMessage(response.statusCode),
-        data: data,
+        data: Array.isArray(data)
+        ? data.map((item) => (item?.toJSON ? item.toJSON() : item))
+        : data?.toJSON
+          ? data.toJSON()
+          : data,
       })),
     );
   }

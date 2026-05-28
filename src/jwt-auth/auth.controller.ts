@@ -10,6 +10,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ApiTags, ApiOperation, ApiBody,ApiBearerAuth } from '@nestjs/swagger';
+import { LocalAuthGuard } from './local-auth.guard';
 
 
 @ApiTags('JWT Authentication')
@@ -23,6 +24,15 @@ export class AuthController {
   @Get('login')
   login() {
     return this.authService.login();
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('passport-login')
+  passportLogin(@Request() req: any) {
+  return {
+    message: 'Passport login successful',
+    user: req.user,
+    };
   }
 
   @ApiOperation({

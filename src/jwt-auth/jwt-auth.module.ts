@@ -9,10 +9,11 @@ import { AuthController } from './auth.controller';
 import { RolesGuard } from './roles.guard';
 import { DatabaseModule } from 'src/database/database.module';
 import { MailService } from './mail.service';
+import { LocalStrategy } from 'src/jwt-auth/local.strategy';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'local', session: false }),
 
     DatabaseModule.register({
       type: 'postgres',
@@ -40,7 +41,7 @@ import { MailService } from './mail.service';
 
   controllers: [AuthController],
 
-  providers: [JwtAuthService, JwtStrategy, RolesGuard, MailService],
+  providers: [JwtAuthService, JwtStrategy, RolesGuard, MailService, LocalStrategy],
 
   exports: [JwtAuthService],
 })

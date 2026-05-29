@@ -20,6 +20,9 @@ import { GatewayExplorerModule } from './chat/discovery/gateway-explorer.module'
 import { JWTAuthModule } from './jwt-auth/jwt-auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { MikroUserModule } from './mikro-user/mikro-user.module';
+import mikroConfig from './mikro-orm.config';
 
 @Module({
   imports: [
@@ -61,6 +64,8 @@ import { APP_GUARD } from '@nestjs/core';
     AuthModule,
     UploadModule,
     JWTAuthModule,
+    MikroOrmModule.forRoot(mikroConfig),
+    MikroUserModule,
   ],
   controllers: [AppController, ProductsController],
   providers: [

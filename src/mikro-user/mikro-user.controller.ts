@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { MikroUserService } from './mikro-user.service';
 
 @Controller('mikro-user')
@@ -15,5 +15,23 @@ export class MikroUserController {
   @Get()
   getUsers() {
     return this.mikroUserService.getUsers();
+  }
+
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.mikroUserService.getUserById(id);
+  }
+
+  @Patch(':id')
+  updateUser(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.mikroUserService.updateUser(id, body);
+  }
+
+  @Delete(':id')
+  deleteUser(@Param('id') id: string) {
+    return this.mikroUserService.deleteUser(id);
   }
 }

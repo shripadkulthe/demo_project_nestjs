@@ -9,6 +9,10 @@ import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { GetAllUsersQuery } from './queries/get-all-users.query';
+import { GetUserByIdQuery } from './queries/get-user-by-id.query';
+import { CreateUserCommand } from './commands/create-user.command';
 
 @Controller('user')
 @UseInterceptors(
@@ -18,6 +22,8 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 )
 export class UserController {
   constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
     private readonly userService: UserService,
     @Inject('APP_CONFIG') private readonly config: any,
   ) {}
@@ -30,7 +36,7 @@ export class UserController {
   @Get()
   @UseInterceptors(new TimeoutInterceptor(5000))
   getAllUsers() {
-    return this.userService.getAllUsers();
+    return this.queryBus.execute(new GetAllUsersQuery());
   }
 
   @Get(':id/validate/:password')
@@ -45,7 +51,7 @@ export class UserController {
   @UseInterceptors(new TimeoutInterceptor(5000))
   getUser(@Param('id') id: string) {
     try {
-      return this.userService.getUser(id);
+      return this.queryBus.execute(new GetUserByIdQuery(id),);
     } catch (error) {
       throw new NotFoundException('Something went wrong');
     }
@@ -54,7 +60,7 @@ export class UserController {
   @Post()
   @UseInterceptors(new TimeoutInterceptor(10000))
   addUser(@Body(new ValidationPipe({ transform: true })) user: UserDto) {
-    return this.userService.addUser(user);
+     return this.commandBus.execute(new CreateUserCommand(user));
   }
 
   @Get('profile/me')

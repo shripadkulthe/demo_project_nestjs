@@ -4,9 +4,20 @@ import { UserService } from './user.service';
 import appConfig from 'src/config/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CreateUserHandler } from './commands/handlers/create-user.handler';
+import { GetAllUsersHandler } from './queries/handlers/get-all-user.handler';
+import { GetUserByIdHandler } from './queries/handlers/get-user-by-id.query';
+
+const CommandHandlers = [CreateUserHandler];
+const QueryHandlers = [
+  GetAllUsersHandler,
+  GetUserByIdHandler,
+];
 
 @Module({
   imports: [
+    CqrsModule,
     MongooseModule.forFeature([
       {
         name: User.name,
@@ -17,6 +28,9 @@ import { User, UserSchema } from './schemas/user.schema';
   controllers: [UserController],
   providers: [
     UserService,
+
+    ...CommandHandlers,
+    ...QueryHandlers,
     {
       provide: 'APP_CONFIG',
       useFactory: async () => {

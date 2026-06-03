@@ -8,12 +8,15 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserHandler } from './commands/handlers/create-user.handler';
 import { GetAllUsersHandler } from './queries/handlers/get-all-user.handler';
 import { GetUserByIdHandler } from './queries/handlers/get-user-by-id.query';
+import { UserCreatedHandler } from './events/handlers/user-created.handler';
 
 const CommandHandlers = [CreateUserHandler];
 const QueryHandlers = [
   GetAllUsersHandler,
   GetUserByIdHandler,
 ];
+
+const EventHandlers = [UserCreatedHandler];
 
 @Module({
   imports: [
@@ -31,6 +34,7 @@ const QueryHandlers = [
 
     ...CommandHandlers,
     ...QueryHandlers,
+    ...EventHandlers,
     {
       provide: 'APP_CONFIG',
       useFactory: async () => {

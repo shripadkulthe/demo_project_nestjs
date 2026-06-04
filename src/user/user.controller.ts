@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, NotFoundException, Param, ParseIntPipe, Post, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, NotFoundException, Param, ParseIntPipe, Post, Put, Delete, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { FirewallGuard } from 'src/firewall/firewall.guard';
@@ -13,6 +13,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllUsersQuery } from './queries/get-all-users.query';
 import { GetUserByIdQuery } from './queries/get-user-by-id.query';
 import { CreateUserCommand } from './commands/create-user.command';
+import { UpdateUserCommand } from './commands/update-user.command';
+import { DeleteUserCommand } from './commands/delete-user.command';
 
 @Controller('user')
 @UseInterceptors(
@@ -72,4 +74,21 @@ export class UserController {
   getUserEmail(@User('email') email: string) {
     return { email };
   }
+
+  @Put(':id')
+  updateUser(
+  @Param('id') id: string,
+  @Body() user: UserDto,
+) {
+  return this.commandBus.execute(
+    new UpdateUserCommand(id, user),
+  );
+}
+
+@Delete(':id')
+  deleteUser(@Param('id') id: string) {
+  return this.commandBus.execute(
+    new DeleteUserCommand(id),
+  );
+}
 }

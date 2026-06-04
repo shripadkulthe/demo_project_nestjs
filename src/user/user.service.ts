@@ -40,6 +40,18 @@ export class UserService {
     return newUser.save();
   }
 
+  async updateUser(id: string, userData: UserDto) {
+    return this.userModel.findByIdAndUpdate(
+      id,
+      userData,
+      { new: true },
+    );
+  }
+
+  async deleteUser(id: string) {
+  return this.userModel.findByIdAndDelete(id);
+  }
+
   private hashPassword(password: string): string {
     return `hashed_${password}_${Date.now()}`;
   }

@@ -1,9 +1,5 @@
-import {
-  CommandHandler,
-  ICommandHandler,
-  EventBus,
-} from '@nestjs/cqrs';
-
+import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common';
 import { DeleteUserCommand } from '../delete-user.command';
 import { UserService } from '../../user.service';
 import { UserDeletedEvent } from '../../events/user-deleted.event';
@@ -18,7 +14,15 @@ export class DeleteUserHandler
   ) {}
 
   async execute(command: DeleteUserCommand) {
-    await this.userService.deleteUser(command.id);
+    const user = await this.userService.deleteUser( 
+      command.id,
+    );
+
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${command.id} not found`,
+      );
+    }
 
     this.eventBus.publish(
       new UserDeletedEvent(command.id),

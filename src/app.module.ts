@@ -23,6 +23,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MikroUserModule } from './mikro-user/mikro-user.module';
 import mikroConfig from './mikro-orm.config';
+import { NecordModule } from 'necord';
+import { PingCommand } from './ping.command';
+import { GatewayIntentBits } from 'discord.js';
 
 @Module({
   imports: [
@@ -66,6 +69,15 @@ import mikroConfig from './mikro-orm.config';
     JWTAuthModule,
     MikroOrmModule.forRoot(mikroConfig),
     MikroUserModule,
+
+    NecordModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        token: configService.getOrThrow<string>('DISCORD_TOKEN'),
+        intents: [GatewayIntentBits.Guilds],
+      }),
+    }),
   ],
   controllers: [AppController, ProductsController],
   providers: [
@@ -75,6 +87,7 @@ import mikroConfig from './mikro-orm.config';
     },
     AppService,
     ProductsService,
+    PingCommand,
   ],
 })
 export class AppModule implements NestModule {

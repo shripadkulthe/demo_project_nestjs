@@ -10,8 +10,16 @@ import { Request, Response } from 'express';
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    console.error('Exception caught:', exception);
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+
+    if (!response || typeof response.status !== 'function') {
+      console.error('Non-HTTP exception');
+      return;
+    }
+
     const request = ctx.getRequest<Request>();
 
     const status =

@@ -26,6 +26,10 @@ import mikroConfig from './mikro-orm.config';
 import { NecordModule } from 'necord';
 import { PingCommand } from './ping.command';
 import { GatewayIntentBits } from 'discord.js';
+import { DiscordService } from './discord/discord.service';
+import { UserInfoCommand } from './discord/commands/userInfo.command';
+import { ServerInfoCommand } from './discord/commands/serverInfo.command';
+import { AvatarCommand } from './discord/commands/avatar.command';
 
 @Module({
   imports: [
@@ -75,18 +79,24 @@ import { GatewayIntentBits } from 'discord.js';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         token: configService.getOrThrow<string>('DISCORD_TOKEN'),
-        intents: [GatewayIntentBits.Guilds],
+        intents: [GatewayIntentBits.Guilds,
+          GatewayIntentBits.GuildMessages,
+        ],
       }),
     }),
   ],
   controllers: [AppController, ProductsController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    //{
+    //  provide: APP_GUARD,
+    //  useClass: ThrottlerGuard,
+    //},
     AppService,
     ProductsService,
+    DiscordService,
+    UserInfoCommand,
+    ServerInfoCommand,
+    AvatarCommand,
     PingCommand,
   ],
 })

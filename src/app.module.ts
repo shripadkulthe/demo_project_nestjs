@@ -30,6 +30,8 @@ import { DiscordService } from './discord/discord.service';
 import { UserInfoCommand } from './discord/commands/userInfo.command';
 import { ServerInfoCommand } from './discord/commands/serverInfo.command';
 import { AvatarCommand } from './discord/commands/avatar.command';
+import { KickCommand } from './discord/commands/kick.command';
+import { BanCommand } from './discord/commands/ban.command';
 
 @Module({
   imports: [
@@ -98,6 +100,8 @@ import { AvatarCommand } from './discord/commands/avatar.command';
     ServerInfoCommand,
     AvatarCommand,
     PingCommand,
+    KickCommand,
+    BanCommand,
   ],
 })
 export class AppModule implements NestModule {
